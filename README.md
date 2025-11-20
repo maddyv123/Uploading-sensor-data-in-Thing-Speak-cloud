@@ -71,12 +71,72 @@ Automatically act on your data and communicate using third-party services like T
 
 
 # PROGRAM:
+```
+#include "DHT.h"
+#include "ThingSpeak.h"
+#include <WiFi.h>
 
+char ssid[]="Mudiyathuu";
+char pass[]="chalowww";
+WiFiClient client;
+
+const int out=2;
+long T;
+float temperature=0;
+float humidity=0;
+DHT dht(out, DHT11);
+
+unsigned long myChannelField=3106383;
+const int TemperatureField=1;
+const int HumidityField=2;
+const char* myWriteAPIKey="65CYHAC1730U46Z9";
+
+void setup() {
+  Serial.begin(115200);
+  ThingSpeak.begin(client);
+  dht.begin();
+  pinMode(out,INPUT);
+
+}
+
+void loop() {
+  if(WiFi.status()!=WL_CONNECTED)
+  {
+    Serial.print("Attempting to connect SSID: ");
+    Serial.println(ssid);
+    while(WiFi.status()!=WL_CONNECTED)
+    {
+      WiFi.begin(ssid,pass);
+      Serial.print(".");
+      delay(5000);
+    }
+    Serial.println("\nConnected.");
+  }
+  temperature=dht.readTemperature();
+  humidity=dht.readHumidity();
+
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" g.m-3");
+  
+  ThingSpeak.setField(TemperatureField,temperature);
+   ThingSpeak.setField(HumidityField,humidity);
+  ThingSpeak.writeFields(myChannelField,myWriteAPIKey);
+  delay(5000);
+}
+```
 # CIRCUIT DIAGRAM:
-
+![WhatsApp Image 2025-10-16 at 09 36 44_e553f3df](https://github.com/user-attachments/assets/2b73ca29-845c-4631-ba34-28a1aeefcf18)
 # OUTPUT:
+<img width="1891" height="930" alt="image" src="https://github.com/user-attachments/assets/4ee6b616-fcce-4f71-aab3-604fb4c8f301" />
+
+
+<img width="1901" height="909" alt="Screenshot 2025-10-17 111846" src="https://github.com/user-attachments/assets/4a31791b-d74d-41de-967a-3af35eb2e956" />
+
 
 # RESULT:
 
 Thus the temperature sensor values are updated in the Thing speak using ESP32 controller.
-
